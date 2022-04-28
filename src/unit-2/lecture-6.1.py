@@ -99,4 +99,5 @@ def drunkTest(walk_len, num_trials, d_class):
         print(' Max =', max(distances), ' Min =', min(distances))
 
 
+random.seed(0)
 drunkTest((0, 1, 2), 100, UsualDrunk)
