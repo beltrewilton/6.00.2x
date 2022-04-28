@@ -241,24 +241,33 @@ class StandardRobot(Robot):
         if self.room.isPositionInRoom(pos):
             if not self.room.isTileCleaned(math.floor(pos.getX()), math.floor(pos.getY())):
                 self.room.cleanTileAtPosition(pos)
+                print('+ clean at (%s, %s)' % (math.floor(pos.getX()), math.floor(pos.getY())))
         else:
             self.setRobotDirection(random.randint(0, 360))
+            print('- clean at (%s, %s)' % (math.floor(pos.getX()), math.floor(pos.getY())))
             return
 
         self.setRobotPosition(pos)
 
 
-
-
-
-
-
-
-
-
-
 # Uncomment this line to see your implementation of StandardRobot in action!
-testRobotMovement(StandardRobot, RectangularRoom)
+# testRobotMovement(StandardRobot, RectangularRoom)
+
+
+def gen_robots(num_robots, robot_type, room, speed):
+    """
+    Cyclical method for serial dispatch of one robot at time
+    :param num_robots:
+    :param robot_type:
+    :param room:
+    :param speed:
+    :return:
+    """
+    robots = [robot_type(room, speed) for i in range(num_robots)]
+    i = 0
+    while True:
+        yield robots[i]
+        i = 0 if i >= len(robots)-1 else i+1
 
 
 # === Problem 4
@@ -280,10 +289,26 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot_type: class of robot to be instantiated (e.g. StandardRobot or
                 RandomWalkRobot)
     """
-    raise NotImplementedError
+    time_steps = []
+    for t in range(num_trials):
+        anim = ps2_visualize.RobotVisualization(num_robots, width, height, 0.0005)
+        room = RectangularRoom(width, height)
+        time_step = 0
+        robots = gen_robots(num_robots, robot_type, room, speed)
+        _robots_ = [next(robots) for i in range(num_robots)]
+        while room.getNumCleanedTiles() < (room.getNumTiles() * min_coverage):
+            robot = next(robots)
+            robot.updatePositionAndClean()
+            anim.update(room, _robots_)
+            time_step += 1
+        time_steps.append(time_step)
+        anim.done()
+
+    return float(round((sum(time_steps)/len(time_steps)) / num_robots))
+
 
 # Uncomment this line to see how much your simulation takes on average
-##print(runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot))
+print(runSimulation(5, 1.0, 20, 20, 1, 30, StandardRobot))
 
 
 # === Problem 5
