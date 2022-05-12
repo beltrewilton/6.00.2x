@@ -1,4 +1,5 @@
 import random
+import pylab
 
 
 class FairRoulette(object):
@@ -99,22 +100,36 @@ def find_pocket_return(game, num_trials, trial_size, to_print):
 
     return pocket_returns
 
+#
+# random.seed(0)
+# num_trials = 20
+# result_dict = {}
+# games = (FairRoulette, EuRoulette, AmRoulette)
+# for G in games:
+#     result_dict[G().__str__()] = []
+#
+# for num_spins in (100, 1000, 10000, 100000):
+#     print('\nSimulate betting a pocket for %s trials %s spins each' % (num_trials, num_spins))
+#     for G in games:
+#         pocket_returns = find_pocket_return(G(), num_trials, num_spins, False)
+#         mean, std = get_mean_and_std(pocket_returns)
+#         result_dict[G().__str__()].append((num_spins, 100*mean, 100*std))
+#         print('Expected return for %s = %s%% +/- %s%% with 95%% confidence.' % (G(), round(100*mean, 3), round(100*1.96*std, 3)))
 
-random.seed(0)
-num_trials = 20
-result_dict = {}
-games = (FairRoulette, EuRoulette, AmRoulette)
-for G in games:
-    result_dict[G().__str__()] = []
 
-for num_spins in (100, 1000, 10000, 100000):
-    print('\nSimulate betting a pocket for %s trials %s spins each' % (num_trials, num_spins))
-    for G in games:
-        pocket_returns = find_pocket_return(G(), num_trials, num_spins, False)
-        mean, std = get_mean_and_std(pocket_returns)
-        result_dict[G().__str__()].append((num_spins, 100*mean, 100*std))
-        print('Expected return for %s = %s%% +/- %s%% with 95%% confidence.' % (G(), round(100*mean, 3), round(100*1.96*std, 3)))
+num_trials = 50000
+num_spins = 200
+game = FairRoulette()
 
+means = []
+for i in range(num_trials):
+    means.append(find_pocket_return(game, 1, num_spins, to_print=False)[0] / num_spins)
+
+pylab.hist(means, bins=100, weights=pylab.array(len(means)*[1])/len(means))
+pylab.xlabel('Mean return')
+pylab.ylabel('Probability')
+pylab.title('Expected return betting a pocket.')
+pylab.show()
 
 
 # num_spins = 100000000

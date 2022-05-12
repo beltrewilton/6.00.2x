@@ -19,6 +19,7 @@ def plot_means(num_dice, num_rolls, num_bins, legend, color, style):
             vals += 5*random.random()
         means.append(vals/float(num_dice))
     pylab.hist(means, num_bins, color=color, label=legend, weights=pylab.array(len(means)*[1])/len(means), hatch= style)
+    print(pylab.array(len(means)*[1])/len(means))
     return get_mean_and_std(means)
 
 
